@@ -15,6 +15,12 @@
             },
             "queue": {
                 "title": "Warteschlange",
+                "transports": "Transports",
+                "transport": "Transport",
+                "type": "Typ",
+                "messages": "Nachrichten",
+                "activeMessages": "Aktive Nachrichten",
+                "unrouted": "(nicht geroutet)",
                 "reset": {
                     "modal": {
                         "title": "Warteschlange zurücksetzen",

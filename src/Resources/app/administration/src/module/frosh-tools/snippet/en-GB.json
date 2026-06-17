@@ -15,6 +15,12 @@
             },
             "queue": {
                 "title": "Queue",
+                "transports": "Transports",
+                "transport": "Transport",
+                "type": "Type",
+                "messages": "Messages",
+                "activeMessages": "Active messages",
+                "unrouted": "(unrouted)",
                 "reset": {
                     "modal": {
                         "title": "Reset Queue",

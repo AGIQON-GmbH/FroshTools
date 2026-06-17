@@ -1,3 +1,29 @@
 .frosh-tab-queue {
     display: block;
 }
+
+.frosh-tab-queue__group-header {
+    td {
+        background-color: rgba(0, 0, 0, 0.03);
+        padding-block: 6px;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    &:hover td {
+        background-color: rgba(0, 0, 0, 0.03) !important;
+    }
+}
+
+.frosh-tab-queue__group-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.frosh-tab-queue__group-count {
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+    opacity: 0.6;
+}

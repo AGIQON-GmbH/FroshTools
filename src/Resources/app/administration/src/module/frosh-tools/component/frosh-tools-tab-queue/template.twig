@@ -21,16 +21,69 @@
         </template>
     </ft-page-head>
     <ft-panel
-        title="Active queues"
-        :count="queueEntries.length"
+        :title="$t('frosh-tools.tabs.queue.transports')"
+        :count="transports.length"
         flush
     >
         <ft-empty
-            v-if="isLoading && !queueEntries.length"
+            v-if="isLoading && !transports.length"
             loading
         />
         <ft-empty
-            v-else-if="!queueEntries.length"
+            v-else-if="!transports.length"
+            title="No transports found"
+        />
+        <div
+            v-else
+            class="ft-table-wrap"
+        >
+            <table class="ft-table">
+                <thead>
+                    <tr>
+                        <ft-th-sort sort-key="name" table="transports">{{ $t('frosh-tools.name') }}</ft-th-sort>
+                        <th>{{ $t('frosh-tools.tabs.queue.type') }}</th>
+                        <ft-th-sort
+                            sort-key="size"
+                            table="transports"
+                            class="ft-table__num"
+                        >{{ $t('frosh-tools.tabs.queue.messages') }}</ft-th-sort>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="(item, idx) in sortRows(transports, 'transports')"
+                        :key="idx"
+                    >
+                        <td class="ft-table__name">
+                            <ft-pill :variant="transportVariant(item.name)">{{ item.name }}</ft-pill>
+                        </td>
+                        <td>
+                            <ft-pill :variant="typeVariant(item.type)" bare>{{ item.type }}</ft-pill>
+                        </td>
+                        <td class="ft-table__num">
+                            <template v-if="item.size < 0">
+                                {{ $t('frosh-tools.unknown') }}
+                            </template>
+                            <template v-else>
+                                {{ Number(item.size).toLocaleString() }}
+                            </template>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </ft-panel>
+    <ft-panel
+        :title="$t('frosh-tools.tabs.queue.activeMessages')"
+        :count="messages.length"
+        flush
+    >
+        <ft-empty
+            v-if="isLoading && !messages.length"
+            loading
+        />
+        <ft-empty
+            v-else-if="!messages.length"
             icon="check"
             title="No pending messages"
             sub="All workers are caught up."
@@ -50,15 +103,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="(item, idx) in sortRows(queueEntries)"
-                        :key="idx"
+                    <template
+                        v-for="group in groupedMessages"
+                        :key="group.transport"
                     >
+                        <tr class="frosh-tab-queue__group-header">
+                            <td colspan="2">
+                                <div class="frosh-tab-queue__group-header-inner">
+                                    <ft-pill
+                                        :variant="transportVariant(group.transport)"
+                                    >{{ group.transport || $t('frosh-tools.tabs.queue.unrouted') }}</ft-pill>
+                                    <span class="frosh-tab-queue__group-count">{{ group.messages.length }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr
+                            v-for="(item, idx) in sortRows(group.messages)"
+                            :key="group.transport + '_' + idx"
+                        >
                         <td class="ft-table__name">{{ item.name }}</td>
-                        <td class="ft-table__num">
-                            {{ Number(item.size).toLocaleString() }}
-                        </td>
-                    </tr>
+                            <td class="ft-table__num">
+                                {{ Number(item.size).toLocaleString() }}
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>

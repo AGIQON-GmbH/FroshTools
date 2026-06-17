@@ -13,7 +13,9 @@ Component.register('frosh-tools-tab-queue', {
 
     data() {
         return {
-            queueEntries: [],
+            transports: [],
+            messages: [],
+            groupedMessages: [],
             showResetModal: false,
             isLoading: true,
         };
@@ -29,13 +31,68 @@ Component.register('frosh-tools-tab-queue', {
             await this.createdComponent();
         },
         async createdComponent() {
-            this.queueEntries = await this.froshToolsService.getQueue();
+            const entries = await this.froshToolsService.getQueue();
 
-            for (const queue of this.queueEntries) {
-                const nameSplit = queue.name.split('\\');
-                queue.name = nameSplit[nameSplit.length - 1];
+            const transports = [];
+            const messages = [];
+
+            for (const entry of entries) {
+                if (entry.type !== undefined) {
+                    transports.push(entry);
+                } else {
+                    const nameSplit = entry.name.split('\\');
+                    entry.name = nameSplit[nameSplit.length - 1];
+                    messages.push(entry);
+                }
             }
+
+            this.transports = transports;
+            this.messages = messages;
+            this.groupedMessages = this.buildGroupedMessages(messages);
             this.isLoading = false;
+        },
+        typeVariant(type) {
+            switch ((type || '').toLowerCase()) {
+                case 'doctrine':
+                    return 'info';
+                case 'redis':
+                    return 'warning';
+                case 'amqp':
+                    return 'accent';
+                default:
+                    return 'muted';
+            }
+        },
+
+        transportVariant(transport) {
+            switch ((transport || '').toLowerCase()) {
+                case 'async':
+                    return 'info';
+                case 'low_priority':
+                    return 'warning';
+                case 'failed':
+                    return 'danger';
+                default:
+                    return 'muted';
+            }
+        },
+
+        buildGroupedMessages(messages) {
+            const groupMap = {};
+
+            for (const msg of messages) {
+                const keys = msg.transports.length > 0 ? msg.transports : [''];
+
+                for (const transport of keys) {
+                    if (!groupMap[transport]) {
+                        groupMap[transport] = { transport, messages: [], totalPending: 0 };
+                    }
+                    groupMap[transport].messages.push(msg);
+                    groupMap[transport].totalPending += msg.size;
+                }
+            }
+
+            return Object.values(groupMap).sort((a, b) => b.totalPending - a.totalPending);
         },
         async resetQueue() {
             this.isLoading = true;
