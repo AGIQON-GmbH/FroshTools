@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Frosh\Tools\Components;
 
 use Shopware\Core\Framework\Increment\IncrementGatewayRegistry;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransport;
@@ -26,6 +27,7 @@ final class QueueInfoService
         private readonly ServiceLocator $transportLocator,
         #[Autowire(param: 'frosh_tools.messenger_routing')]
         private readonly array $messengerRouting,
+        private readonly SystemConfigService $systemConfigService,
     ) {
     }
 
@@ -65,9 +67,11 @@ final class QueueInfoService
         $incrementer = $this->incrementer->get('message_queue');
         $list        = $incrementer->list('message_queue_stats', -1);
 
+        $showZeroCount = $this->systemConfigService->getBool('FroshTools.config.queueShowZeroCountMessages');
+
         $entries = [];
         foreach (array_values($list) as $entry) {
-            if ((int) $entry['count'] === 0) {
+            if (!$showZeroCount && (int) $entry['count'] === 0) {
                 continue;
             }
 

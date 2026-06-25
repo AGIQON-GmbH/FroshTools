@@ -33,4 +33,18 @@
         </input-field>
     </card>
 
+    <card>
+        <title>Queue</title>
+        <title lang="de-DE">Queue</title>
+
+        <input-field type="bool">
+            <name>queueShowZeroCountMessages</name>
+            <label>Show messages with zero pending count</label>
+            <label lang="de-DE">Nachrichten mit null ausstehenden Einträgen anzeigen</label>
+            <helpText>When enabled, message classes with a pending count of zero are still listed in the queue tab.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, werden Nachrichtenklassen mit einem ausstehenden Zähler von null weiterhin im Queue-Tab angezeigt.</helpText>
+            <defaultValue>true</defaultValue>
+        </input-field>
+    </card>
+
 </config>
